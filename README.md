@@ -74,18 +74,18 @@ export OTEL_LOG_USER_PROMPTS=1    # user prompts
 
 ## Useful commands
 
-A `Makefile` is included for convenience:
+A `mise.toml` is included for convenience (requires [mise](https://mise.jdx.dev/)):
 
 ```bash
-make up              # Start the stack (docker compose up -d)
-make down            # Stop the stack
-make restart         # Restart all services
-make ps              # Show container status
-make logs-collector  # Stream OTel Collector logs
-make logs-loki       # Stream Loki logs
-make logs-prometheus # Stream Prometheus logs
-make logs-tempo      # Stream Tempo logs
-make logs-grafana    # Stream Grafana logs
+mise run up              # Start the stack (docker compose up -d)
+mise run down            # Stop the stack
+mise run restart         # Restart all services
+mise run ps              # Show container status
+mise run logs:collector  # Stream OTel Collector logs
+mise run logs:loki       # Stream Loki logs
+mise run logs:prometheus # Stream Prometheus logs
+mise run logs:tempo      # Stream Tempo logs
+mise run logs:grafana    # Stream Grafana logs
 ```
 
 Or use Docker Compose directly:
