@@ -3,7 +3,7 @@ auth_enabled: false
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
-  log_level: warn
+  log_level: info
 
 common:
   instance_addr: 127.0.0.1
@@ -16,6 +16,16 @@ common:
   ring:
     kvstore:
       store: inmemory
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
 
 schema_config:
   configs:
@@ -36,6 +46,9 @@ compactor:
   retention_enabled: true
   retention_delete_delay: 2h
   delete_request_store: filesystem
+
+pattern_ingester:
+  enabled: false
 
 analytics:
   reporting_enabled: false
