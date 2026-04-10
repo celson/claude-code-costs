@@ -1,114 +1,114 @@
 # claude-code-costs
 
-Stack de observabilidade local para monitorar telemetria do [Claude Code](https://claude.ai/code) via OpenTelemetry. Captura logs, métricas e traces do Claude Code e os visualiza no Grafana.
+Local observability stack for monitoring [Claude Code](https://claude.ai/code) telemetry via OpenTelemetry. Captures logs, metrics, and traces from Claude Code and visualizes them in Grafana.
 
-## Arquitetura
+## Architecture
 
 ```
-Claude Code → OTel Collector → Loki       (logs,    retenção 30 dias)
-                             → Prometheus  (métricas, retenção 30 dias)
-                             → Tempo       (traces,   retenção 72h)
+Claude Code → OTel Collector → Loki        (logs,    30-day retention)
+                             → Prometheus   (metrics, 30-day retention)
+                             → Tempo        (traces,  72h retention)
                                    ↓
-                               Grafana     (visualização + correlação)
+                               Grafana      (visualization + correlation)
 ```
 
-## Serviços
+## Services
 
-| Serviço | Porta(s) | Descrição |
+| Service | Port(s) | Description |
 |---|---|---|
-| OTel Collector | `4317` (gRPC), `4318` (HTTP), `8888` (métricas internas) | Recebe telemetria do Claude Code e roteia para os backends |
-| Loki | `3100` | Armazenamento de logs (retenção 30 dias) |
-| Prometheus | `9090` | Armazenamento de métricas (retenção 30 dias) |
-| Tempo | `3200` (HTTP), `4319` (gRPC) | Armazenamento de traces (retenção 72h) |
-| Grafana | `3000` | Visualização (login: `admin` / `admin`) |
+| OTel Collector | `4317` (gRPC), `4318` (HTTP), `8888` (internal metrics) | Receives telemetry from Claude Code and routes to backends |
+| Loki | `3100` | Log storage (30-day retention) |
+| Prometheus | `9090` | Metrics storage (30-day retention) |
+| Tempo | `3200` (HTTP), `4319` (gRPC) | Trace storage (72h retention) |
+| Grafana | `3000` | Visualization (login: `admin` / `admin`) |
 
-## Requisitos
+## Requirements
 
-- [Docker](https://docs.docker.com/get-docker/) com Docker Compose
+- [Docker](https://docs.docker.com/get-docker/) with Docker Compose
 
-## Uso
+## Usage
 
-### 1. Subir a stack
+### 1. Start the stack
 
 ```bash
 docker compose up -d
 ```
 
-### 2. Configurar e iniciar o Claude Code com telemetria
+### 2. Configure and start Claude Code with telemetry
 
 ```bash
 source ./claude-env.sh
 claude
 ```
 
-O script `claude-env.sh` configura as variáveis de ambiente `OTEL_*` e `CLAUDE_CODE_*` apontando para `localhost:4317` (gRPC) e `localhost:4318` (HTTP para beta tracing).
+The `claude-env.sh` script sets the `OTEL_*` and `CLAUDE_CODE_*` environment variables pointing to `localhost:4317` (gRPC) and `localhost:4318` (HTTP for beta tracing).
 
-Por padrão o endpoint aponta para `localhost`. Para usar um host remoto (ex: via Tailscale):
+By default the endpoint points to `localhost`. To use a remote host (e.g., via Tailscale):
 
 ```bash
 OTEL_HOST=100.74.255.104 source ./claude-env.sh
 claude
 ```
 
-### 3. Acessar o Grafana
+### 3. Access Grafana
 
-Abra [http://localhost:3000](http://localhost:3000) e faça login com `admin` / `admin`.
+Open [http://localhost:3000](http://localhost:3000) and log in with `admin` / `admin`.
 
-O dashboard **Claude Code** é provisionado automaticamente com as três datasources (Loki, Prometheus e Tempo) e correlação bidirecional entre elas:
+The **Claude Code** dashboard is automatically provisioned with all three datasources (Loki, Prometheus, and Tempo) and bidirectional correlation between them:
 
-- Logs → Traces (via `trace_id` nos logs)
+- Logs → Traces (via `trace_id` in log lines)
 - Traces → Logs
-- Traces → Métricas
+- Traces → Metrics
 
-## Captura de conteúdo adicional (opcional)
+## Capturing additional content (optional)
 
-Descomente as linhas no final de `claude-env.sh` para capturar mais dados:
+Uncomment the lines at the bottom of `claude-env.sh` to capture more data:
 
 ```bash
-export OTEL_LOG_TOOL_CONTENT=1    # conteúdo das ferramentas
-export OTEL_LOG_TOOL_DETAILS=1    # detalhes das ferramentas
-export OTEL_LOG_USER_PROMPTS=1    # prompts do usuário
+export OTEL_LOG_TOOL_CONTENT=1    # tool content
+export OTEL_LOG_TOOL_DETAILS=1    # tool details
+export OTEL_LOG_USER_PROMPTS=1    # user prompts
 ```
 
-> **Atenção:** capturar prompts e conteúdo de ferramentas pode incluir informações sensíveis nos logs.
+> **Warning:** capturing prompts and tool content may include sensitive information in the logs.
 
-## Comandos úteis
+## Useful commands
 
 ```bash
-# Ver logs de um serviço
+# Stream logs from a service
 docker compose logs -f otel-collector
 docker compose logs -f loki
 docker compose logs -f prometheus
 docker compose logs -f tempo
 docker compose logs -f grafana
 
-# Status dos containers
+# Check container status
 docker compose ps
 
-# Derrubar a stack
+# Stop the stack
 docker compose down
 
-# Derrubar e remover volumes (apaga todos os dados)
+# Stop and remove volumes (deletes all data)
 docker compose down -v
 ```
 
-## Retenção de dados
+## Data retention
 
-| Backend | Retenção | Configuração |
+| Backend | Retention | Configuration |
 |---|---|---|
-| Loki | 30 dias | `loki-config.yaml` → `limits_config.retention_period` |
-| Prometheus | 30 dias | `docker-compose.yml` → `--storage.tsdb.retention.time` |
-| Tempo | 72 horas | `tempo.yaml` → `compactor.compaction.block_retention` |
+| Loki | 30 days | `loki-config.yaml` → `limits_config.retention_period` |
+| Prometheus | 30 days | `docker-compose.yml` → `--storage.tsdb.retention.time` |
+| Tempo | 72 hours | `tempo.yaml` → `compactor.compaction.block_retention` |
 
-## Provisionamento
+## Provisioning
 
 - **Datasources:** `grafana/provisioning/datasources/datasources.yaml`
 - **Dashboards:** `grafana/provisioning/dashboards/`
-- **Dashboard principal:** `grafana/provisioning/dashboards/claude-code.json`
-- **Config Loki:** `loki-config.yaml`
-- **Config Tempo:** `tempo.yaml`
+- **Main dashboard:** `grafana/provisioning/dashboards/claude-code.json`
+- **Loki config:** `loki-config.yaml`
+- **Tempo config:** `tempo.yaml`
 
-Alterações nos dashboards ou datasources entram em vigor com:
+Dashboard and datasource changes take effect after:
 
 ```bash
 docker compose restart grafana
