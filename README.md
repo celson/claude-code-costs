@@ -25,6 +25,7 @@ Claude Code → OTel Collector → Loki        (logs,    30-day retention)
 ## Requirements
 
 - [Docker](https://docs.docker.com/get-docker/) with Docker Compose
+- [mise](https://mise.jdx.dev/) (optional, for task shortcuts)
 
 ## Usage
 
@@ -74,7 +75,13 @@ export OTEL_LOG_USER_PROMPTS=1    # user prompts
 
 ## Useful commands
 
-A `mise.toml` is included for convenience (requires [mise](https://mise.jdx.dev/)):
+A `mise.toml` is included for convenience. After installing [mise](https://mise.jdx.dev/), trust the config once:
+
+```bash
+mise trust
+```
+
+Then use the task shortcuts:
 
 ```bash
 mise run up              # Start the stack (docker compose up -d)
