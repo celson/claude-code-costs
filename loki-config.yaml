@@ -28,6 +28,7 @@ schema_config:
         period: 24h
 
 limits_config:
+  ingestion_rate_strategy: local
   retention_period: 30d
 
 compactor:
