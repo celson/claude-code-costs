@@ -12,9 +12,11 @@ services:
     restart: unless-stopped
     depends_on:
       loki:
-        condition: service_healthy
+        condition: service_started
       prometheus:
         condition: service_healthy
+      tempo:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:13133/ || exit 1"]
       interval: 10s
@@ -90,11 +92,11 @@ services:
     restart: unless-stopped
     depends_on:
       loki:
-        condition: service_healthy
+        condition: service_started
       prometheus:
         condition: service_healthy
       tempo:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:3000/api/health || exit 1"]
       interval: 10s
