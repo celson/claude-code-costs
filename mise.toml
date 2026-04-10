@@ -1,0 +1,35 @@
+[tasks.up]
+run = "docker compose up -d"
+description = "Start the stack"
+
+[tasks.down]
+run = "docker compose down"
+description = "Stop the stack"
+
+[tasks.restart]
+run = "docker compose restart"
+description = "Restart all services"
+
+[tasks.ps]
+run = "docker compose ps"
+description = "Show container status"
+
+[tasks."logs:collector"]
+run = "docker compose logs -f otel-collector"
+description = "Stream OTel Collector logs"
+
+[tasks."logs:loki"]
+run = "docker compose logs -f loki"
+description = "Stream Loki logs"
+
+[tasks."logs:prometheus"]
+run = "docker compose logs -f prometheus"
+description = "Stream Prometheus logs"
+
+[tasks."logs:tempo"]
+run = "docker compose logs -f tempo"
+description = "Stream Tempo logs"
+
+[tasks."logs:grafana"]
+run = "docker compose logs -f grafana"
+description = "Stream Grafana logs"
