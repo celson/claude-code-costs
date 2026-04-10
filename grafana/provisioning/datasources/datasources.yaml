@@ -35,3 +35,6 @@ datasources:
         mapTagNamesEnabled: true
       tracesToMetrics:
         datasourceUid: prometheus
+        queries:
+          - name: "Request rate"
+            query: "rate(traces_spanmetrics_calls_total{$$__tags}[5m])"
