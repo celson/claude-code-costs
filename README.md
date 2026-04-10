@@ -74,20 +74,23 @@ export OTEL_LOG_USER_PROMPTS=1    # user prompts
 
 ## Useful commands
 
+A `Makefile` is included for convenience:
+
 ```bash
-# Stream logs from a service
-docker compose logs -f otel-collector
-docker compose logs -f loki
-docker compose logs -f prometheus
-docker compose logs -f tempo
-docker compose logs -f grafana
+make up              # Start the stack (docker compose up -d)
+make down            # Stop the stack
+make restart         # Restart all services
+make ps              # Show container status
+make logs-collector  # Stream OTel Collector logs
+make logs-loki       # Stream Loki logs
+make logs-prometheus # Stream Prometheus logs
+make logs-tempo      # Stream Tempo logs
+make logs-grafana    # Stream Grafana logs
+```
 
-# Check container status
-docker compose ps
+Or use Docker Compose directly:
 
-# Stop the stack
-docker compose down
-
+```bash
 # Stop and remove volumes (deletes all data)
 docker compose down -v
 ```
