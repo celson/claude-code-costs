@@ -10,6 +10,16 @@ distributor:
 
 ingester:
   max_block_duration: 5m
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+
+memberlist:
+  abort_if_cluster_join_fails: false
+  join_members: []
 
 compactor:
   compaction:
